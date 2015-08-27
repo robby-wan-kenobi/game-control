@@ -11,5 +11,5 @@ Also worthy of note is that I set up a scheduled task in Windows to run every 10
 
 ## To run
 
-Add the GameControl.exe and UpdateRegistry.exe to your PATH and set up the scheduled task to run the following
+Add the GameControl.exe and UpdateRegistry.exe to your PATH and set up the scheduled task to run the following:
 ```GameControl.exe check```
