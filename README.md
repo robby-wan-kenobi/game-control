@@ -8,3 +8,8 @@ them to get around it. There's also a hidden project in here (UpdateRegistry) th
 with permissions.
 
 Also worthy of note is that I set up a scheduled task in Windows to run every 10 minutes to check if anything is running.
+
+## To run
+
+Add the GameControl.exe and UpdateRegistry.exe to your PATH and set up the scheduled task to run the following
+```GameControl.exe check```
