@@ -38,7 +38,7 @@ namespace GameControl {
 			((XmlElement)toastNode).SetAttribute("launch", "{\"type\":\"toast\",\"param1\":\"12345\",\"param2\":\"67890\"}");
 
 			ToastNotification toast = new ToastNotification(toastXml);
-			ToastNotificationManager.CreateToastNotifier("GameControl.GameControl").Show(toast);
+			ToastNotificationManager.CreateToastNotifier("GameControl").Show(toast);
 		}
 	}
 }

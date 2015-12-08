@@ -11,10 +11,23 @@ namespace GameControl {
 	public class ExeHandler {
 
 		private readonly string steamBase = "D:\\steam\\games\\steamapps\\common";
-		private readonly string registryKey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
 		private readonly string thisApp = "GameControl";
 
-		private readonly string[] otherNames = { "vcredist_x64.exe", "vcredist_x86.exe", "dxsetup.exe" };
+		private readonly string[] otherNames = { "vcredist_x64.exe", "vcredist_x86.exe", "dxsetup.exe", "DXSETUP.exe",
+												"eadm-installer.exe", "PhysX_SystemSoftware.exe", "vcredist_x86_en.exe", "vcredist_x86_de.exe",
+												"vcredist_x86_fr.exe", "vcredist_x86_it.exe", "vcredist_x86_es.exe", "vc_redist.x64.exe",
+												"vc_redist.x86.exe", "CaptiveAppEntry.exe", "RegVideoDLL.exe", "monolinker.exe",
+												"ilasm.exe", "sqlmetal.exe", "smcs.exe", "installutil.exe",
+												"sgen.exe", "monop.exe", "lc.exe", "httpcfg.exe",
+												"resgen.exe", "mdoc.exe", "mono-xmltool.exe", "al.exe",
+												"svcutil.exe", "mono-shlib-cop.exe", "gmcs.exe", "sqlsharp.exe",
+												"pdb2mdb.exe", "nunit-console.exe", "mkbundle.exe", "booc.exe",
+												"mono-api-info.exe", "xsd.exe", "xbuild.exe", "us.exe",
+												"RabbitMQ.Client.Apigen.exe", "csharp.exe", "wsdl.exe", "mono-service.exe",
+												"mconfig.exe", "gacutil.exe", "mono.exe", "eauninstall.exe",
+												"dotnetfx35.exe", "dotnetfx35setup.exe", "Helper.exe", "LegacyFirewallAdd.exe",
+												"LegacyFirewallDel.exe", "GDFTool.exe", "unins000.exe", "Editor.exe",
+												"gu.exe", "UplayInstaller.exe"};
 		private string[] exes;
 
 		public ExeHandler() {

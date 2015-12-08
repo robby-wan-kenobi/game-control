@@ -25,13 +25,36 @@ namespace GameControl.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string file {
+        public global::System.DateTime PlayTime {
             get {
-                return ((string)(this["file"]));
+                return ((global::System.DateTime)(this["PlayTime"]));
             }
             set {
-                this["file"] = value;
+                this["PlayTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float DayTotal {
+            get {
+                return ((float)(this["DayTotal"]));
+            }
+            set {
+                this["DayTotal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Playing {
+            get {
+                return ((bool)(this["Playing"]));
+            }
+            set {
+                this["Playing"] = value;
             }
         }
     }

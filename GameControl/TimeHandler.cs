@@ -12,7 +12,6 @@ using System.Xml;
 
 namespace GameControl {
 	public class TimeHandler {
-		private bool timerRunning;
 		private ExeHandler exeHandler;
 
 		private DateTime fridayEnd;
@@ -25,21 +24,12 @@ namespace GameControl {
 		private bool warning5;
 		private bool warning1;
 
-		private string tempDir;
-
-		private List<DateTime> starts;
-		private List<DateTime> ends;
-
 		public TimeHandler() {
-			starts = new List<DateTime>();
-			ends = new List<DateTime>();
-			tempDir = Environment.GetEnvironmentVariable("TEMP");
 			exeHandler = new ExeHandler();
-			timerRunning = false;
 			DateTime now = DateTime.Now;
 			DateTime tomorrow = DateTime.Now.AddDays(1f);
 			dayStart = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0);
-			otherEnd = new DateTime(now.Year, now.Month, now.Day, 23, 30, 0);
+			otherEnd = new DateTime(now.Year, now.Month, now.Day, 23, 00, 0);
 			fridayEnd = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 1, 0, 0);
 
 			warningHour = false;
@@ -47,67 +37,21 @@ namespace GameControl {
 			warning10 = false;
 			warning5 = false;
 			warning1 = false;
-
-			readXML();
 		}
 
-		private void writeXML() {
-			string filePath = getPath();
-
-			XmlDocument xml = new XmlDocument();
-			XmlNode root = xml.CreateElement("root");
-			xml.AppendChild(root);
-
-			XmlNode start = xml.CreateElement("start");
-			root.AppendChild(start);
-			foreach(DateTime d in starts) {
-				XmlNode timeElement = xml.CreateElement("time");
-				XmlNode time = xml.CreateTextNode(d.ToString());
-				timeElement.AppendChild(time);
-				start.AppendChild(timeElement);
-			}
-
-			XmlNode end = xml.CreateElement("end");
-			root.AppendChild(end);
-			foreach(DateTime d in ends) {
-				XmlNode timeElement = xml.CreateElement("time");
-				XmlNode time = xml.CreateTextNode(d.ToString());
-				timeElement.AppendChild(time);
-				end.AppendChild(timeElement);
-			}
-
-			xml.Save(filePath);
+		private DateTime getTime() {
+			return Properties.Settings.Default.PlayTime;
 		}
 
-		private void readXML() {
-			string filePath = getPath();
-			if(!File.Exists(filePath))
-				return;
-
-			XmlDocument xml = new XmlDocument();
-			xml.Load(filePath);
-
-			XmlNode startNode = xml.GetElementsByTagName("start")[0];
-			foreach(XmlNode child in startNode.ChildNodes)
-				starts.Add(DateTime.Parse(child.ChildNodes[0].Value));
-			
-			XmlNode endNode = xml.GetElementsByTagName("end")[0];
-			foreach(XmlNode child in endNode.ChildNodes)
-				ends.Add(DateTime.Parse(child.ChildNodes[0].Value));
-
-			DateTime lastDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 7, 0, 0);
-			if(ends[ends.Count() - 1] < lastDay) {
-				starts = new List<DateTime>();
-				ends = new List<DateTime>();
-			}
+		private float getDayTotal() {
+			float total = 0f;
+			if(Properties.Settings.Default.Playing)
+				total = getCurrentTotal();
+			return total + Properties.Settings.Default.DayTotal;
 		}
 
-		private string getPath() {
-			if(Properties.Settings.Default.file == "") {
-				Properties.Settings.Default.file = Guid.NewGuid().ToString().Substring(0, 4);
-				Properties.Settings.Default.Save();
-			}
-			return tempDir + "\\tmp" + Properties.Settings.Default.file.ToUpper() + ".tmp";
+		private float getCurrentTotal() {
+			return DateTime.Now.Subtract(Properties.Settings.Default.PlayTime).Minutes;
 		}
 
 		public bool CheckTime() {
@@ -116,29 +60,27 @@ namespace GameControl {
 					NotificationHandler.NotifyWindows("Can't play on Sunday.");
 					return false;
 				case DayOfWeek.Saturday:
-					return handleDay(5.0 * 60.0, 120.0, 60.0, dayStart, otherEnd);
+					return handleDay(5.0f * 60.0f, 120.0f, 60.0f, dayStart, otherEnd);
 				case DayOfWeek.Friday:
-					return handleDay(4.0 * 60.0, 120.0, 60.0, dayStart, fridayEnd);
+					return handleDay(4.0f * 60.0f, 120.0f, 60.0f, dayStart, fridayEnd);
 				default:
-					return handleDay(2.0 * 60.0, 120.0, 60.0, dayStart, otherEnd);
+					return handleDay(2.0f * 60.0f, 120.0f, 60.0f, dayStart, otherEnd);
 			}
 		}
 
-		private bool handleDay(double totalTimeForDay, double maxTimeForSession, double minTimeBetweenSessions, DateTime startOfTheDay, DateTime endOfTheDay) {
-			bool withinSpan = beforeEndAfterStart(startOfTheDay, endOfTheDay);
-			if(!withinSpan) {
+		private bool handleDay(float totalTimeForDay, float maxTimeForSession, float minTimeBetweenSessions, DateTime startOfTheDay, DateTime endOfTheDay) {
+			if(!beforeEndAfterStart(startOfTheDay, endOfTheDay)) {
 				NotificationHandler.NotifyWindows("You should be sleeping.");
 				return false;
 			}
-			double totalBeforeCurrentSession = totalNonSessionTime();
-			if(totalBeforeCurrentSession >= totalTimeForDay) {
+			if(getDayTotal() >= totalTimeForDay) {
 				return false;
 			}
 				
 			bool liveSession = exeHandler.ExesRunning().Length > 0;
 			if(liveSession) {
-				double totalOfCurrentSession = totalSessionTime();
-				double timeLeft = maxTimeForSession - totalOfCurrentSession;
+				float totalOfCurrentSession = getCurrentTotal();
+				float timeLeft = maxTimeForSession - totalOfCurrentSession;
 				if(totalOfCurrentSession >= maxTimeForSession) {
 					return false;
 				} else if(!warningHour && Math.Abs(timeLeft - 60.0) <= 1.5) {
@@ -158,8 +100,8 @@ namespace GameControl {
 					warning1 = true;
 				}
 			} else {
-				double breakTime = timeSinceLastSession();
-				double timeLeft = minTimeBetweenSessions - breakTime;
+				float breakTime = timeSinceLastSession();
+				float timeLeft = minTimeBetweenSessions - breakTime;
 				if(breakTime < minTimeBetweenSessions) {
 					NotificationHandler.NotifyWindows("Not yet. Try again in " + (int)(timeLeft) + " minutes.");
 					return false;
@@ -174,41 +116,24 @@ namespace GameControl {
 			return beforeBedtime && afterEarly;
 		}
 
-		private double totalSessionTime() {
-			if(starts.Count == ends.Count)
-				return 0.0;
-			return (DateTime.Now - starts[starts.Count() - 1]).TotalMinutes;
-		}
-
-		private double totalNonSessionTime() {
-			int count = Math.Min(starts.Count(), ends.Count());
-			double runningTotal = 0.0;
-			for(int i = 0; i < count; i++) {
-				runningTotal += (ends[i] - starts[i]).TotalMinutes;
-			}
-			return runningTotal;
-		}
-
-		private double timeSinceLastSession() {
-			if(ends.Count() == 0)
-				return 61.0;
-			return (DateTime.Now - ends[ends.Count() - 1]).TotalMinutes;
+		private float timeSinceLastSession() {
+			return DateTime.Now.Subtract(Properties.Settings.Default.PlayTime).Minutes;
 		}
 
 		public bool IsTimerRunning() {
-			return timerRunning;
+			return Properties.Settings.Default.Playing;
 		}
 
 		public void StartTimer() {
-			timerRunning = true;
-			starts.Add(DateTime.Now);
-			writeXML();
+			Properties.Settings.Default.PlayTime = DateTime.Now;
+			Properties.Settings.Default.Playing = true;
+			Properties.Settings.Default.Save();
 		}
 
 		public void StopTimer() {
-			timerRunning = false;
-			ends.Add(DateTime.Now);
-			writeXML();
+			Properties.Settings.Default.PlayTime = DateTime.Now;
+			Properties.Settings.Default.Playing = true;
+			Properties.Settings.Default.Save();
 		}
 	}
 }
