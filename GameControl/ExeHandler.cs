@@ -83,7 +83,7 @@ namespace GameControl {
 
 		private void remoteCallEnableDisable(string exeName, bool enable) {
 			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.Arguments = exeName + (enable ? " true" : " false");
+			startInfo.Arguments = "\"" + exeName + "\"" + (enable ? " true" : " false");
 			startInfo.FileName = "UpdateRegistry.exe";
 			startInfo.Verb = "runas";
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
