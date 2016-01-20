@@ -1,4 +1,6 @@
 # game-control
+NOTE: This is in a broken state and I haven't had time to fix it. Use at your own risk.
+
 Windows 8 (and up) app for controlling video game playing
 
 I wanted some kind of program to give me warnings and even stop the game that I've been playing if it's been a while, but I 
